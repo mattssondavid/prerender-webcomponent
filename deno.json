@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"]
+    },
+    "fmt": {
+        "files": {
+            "include": ["./src/"]
+        },
+        "options": {
+            "indentWidth": 4,
+            "lineWidth": 80,
+            "proseWrap": "preserve",
+            "singleQuote": true,
+            "useTabs": false
+        }
+    },
+    "imports": {
+        "@server/": "./src/server/",
+        "@client/": "./src/client/",
+        "@std": "jsr:@std",
+        "@util/": "./src/util/"
+    },
+    "tasks": {
+        "build": "echo 'Not Implemented'",
+        "test": "deno test --allow-env"
+    }
+}

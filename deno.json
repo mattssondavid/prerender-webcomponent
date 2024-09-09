@@ -18,7 +18,8 @@
         "@server/": "./src/server/",
         "@client/": "./src/client/",
         "@std": "jsr:@std",
-        "@util/": "./src/util/"
+        "@util/": "./src/util/",
+        "jsdom": "npm:jsdom@25.0.0"
     },
     "tasks": {
         "build": "echo 'Not Implemented'",

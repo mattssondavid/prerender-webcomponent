@@ -128,16 +128,20 @@ describe('getHTML', (): void => {
 
     it('serialises simple nestled div with child (div > p) where div and p have attributes', (): void => {
         const p = document.createElement('p');
-        p.setAttribute('id', 'bar');
-        p.classList.add('foo');
+        p.setAttribute('id', 'p-id');
+        p.classList.add('p-class');
         p.textContent = 'Hello there';
         const div = document.createElement('div');
-        div.setAttribute('id', 'foo');
-        div.classList.add('bar');
+        div.setAttribute('id', 'div-id');
+        div.classList.add('div-class');
         div.appendChild(p);
 
         const actual = getHTML(div);
-        const expected = `<p id="bar" class="foo">Hello there</p>`;
+        // Note. If DOM is parsed via `Linkedom` there is a bug where the
+        // element `setAttribute` call order is ignored causing element
+        // attributes to be added in reverse order (i.e. class="..." id="...")
+        // as such, `JSDOM` is prefered over `Linkedom` to add DOM support.
+        const expected = `<p id="p-id" class="p-class">Hello there</p>`;
 
         assertEquals(actual, expected);
     });
@@ -193,7 +197,7 @@ describe('getHTML', (): void => {
         document.body.appendChild(element);
 
         const actual = getHTML(element, { serializableShadowRoots: true });
-        // ToDo: In the future when Linkedom supports `ShadowRoot.delegatesFocus`
+        // ToDo: In the future when JSDOM supports `ShadowRoot.delegatesFocus`
         // update the expected value to include `shadowrootdelegatesfocus=""`
         const expected = `<template shadowrootmode="open"\
         shadowrootserializable=""><slot></slot></template><p>Hello there</p>`.replaceAll(

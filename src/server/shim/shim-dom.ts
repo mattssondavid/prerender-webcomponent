@@ -1,6 +1,5 @@
 import { getHTML } from '@server/shim/shim-getHtml.ts';
-import { parseHTML } from 'npm:linkedom@0.18.4';
-import { JSDOM } from 'npm:jsdom@25.0.0';
+import { JSDOM } from 'jsdom';
 
 declare global {
     interface SerializableElement {
@@ -19,9 +18,8 @@ declare global {
 /**
  * Patch the `globalThis` variable
  */
-const patchGlobalThis = () => {
+const patchGlobalThis = (): void => {
     const baseHTML = `<!DOCTYPE html><html><head></head><body></body></html>`;
-    // const { window } = parseHTML(baseHTML);
     const { window } = new JSDOM(baseHTML, { pretendToBeVisual: true });
 
     const patchedDOMAPIs = [
@@ -34,12 +32,6 @@ const patchGlobalThis = () => {
         'HTMLTemplateElement',
         'Node',
         'ShadowRoot',
-        // TEMP
-        'NodeFilter', // Doesn't exist on linkedom
-        'SVGElement',
-        'CDATASection',
-        'Text',
-        'Comment',
     ];
     // Patch/Polyfill `globalThis`
     patchedDOMAPIs.forEach((domApi: string): void => {

@@ -11,7 +11,7 @@ type GetHTMLOptions = {
  *
  * __Note__: This algorithm serializes the children of the node being serialized, not the node itself.
  *
- * @param {globalThis.Node} node The node to serialize
+ * @param {globalThis.Node} node The node to serialize, where `node` is expected to be either an `Element`, `ShadowRoot` or a `DocumentFragment`
  * @param {{serializableShadowRoots: boolean, shadowRoots: globalThis.ShadowRoot[]}} options Options
  * @returns {string} A string that represents the HTML serialization of the node
  * @throws None
@@ -21,34 +21,11 @@ type GetHTMLOptions = {
  */
 export const getHTML = (
     node: Node,
-    // | globalThis.Element
-    // | globalThis.ShadowRoot
-    // | globalThis.DocumentFragment,
-    // opts: Record<string, boolean | string[]>
     options?: GetHTMLOptions | undefined
 ): string => {
     if (node instanceof globalThis.HTMLTemplateElement) {
         node = node.content; // DocumentFragment
     }
-
-    console.log('-= Details =-');
-    console.log('Node');
-    console.log(`\tNode name: ${node.nodeName}`);
-    console.log(`\tNode Type: ${node.nodeType}`);
-    console.log(`\tNode Value: ${node.nodeValue}`);
-
-    console.log('Options');
-    console.log(
-        `\tserializableShadowRoots: ${options?.serializableShadowRoots}`
-    );
-    console.log(`\tshadowRoots: ${options?.shadowRoots}`);
-
-    console.log(
-        `Node instance: ${
-            node instanceof Object && Object(node).constructor.name
-        }`
-    );
-
     let serializeResult = '';
 
     // Check if node serialises as void...
@@ -79,11 +56,7 @@ export const getHTML = (
     if (node.nodeType === globalThis.Node.ELEMENT_NODE) {
         if ((node as Element).shadowRoot !== null) {
             // `node` is a Shadow Host
-            console.log('Shadow node');
-            console.log(`\tShadow Host: ${(node as Element).outerHTML}`);
-
             const shadow = (node as Element).shadowRoot!;
-            console.log(`\tShadow Root: ${shadow}`);
 
             // Temporary patches if not properly defined
             if (typeof shadow.clonable === 'undefined') {
@@ -104,16 +77,6 @@ export const getHTML = (
                     shadow.serializable === true) ||
                 options?.shadowRoots?.includes(shadow)
             ) {
-                console.log(`\tShadow Root details`);
-                console.log(`\t\tmode: ${shadow.mode}`);
-                console.log(`\t\tclonable: ${shadow.clonable}`);
-                console.log(`\t\tdelegatesFocus: ${shadow.delegatesFocus}`);
-                console.log(`\t\tserializable: ${shadow.serializable}`);
-                const children = Array.from(shadow.childNodes.values()).map(
-                    (node): string => `${node.nodeType} – ${node.nodeName}`
-                );
-                console.log(`\t\tchildren: ${children.join(',')}`);
-
                 const template = html`<template
                     shadowrootmode="${shadow.mode}"
                     ${shadow.delegatesFocus
@@ -133,23 +96,24 @@ export const getHTML = (
 
     const fragments = Array.from(node.childNodes).map(
         (currentNode: Node): string => {
-            console.log(`Child node`);
-            console.log(`\tNode name: ${currentNode.nodeName}`);
-            console.log(`\tNode Type: ${currentNode.nodeType}`);
-            console.log(`\tNode Value: ${currentNode.nodeValue}`);
-            const children = [...currentNode.childNodes.values()]
-                .map((node): string => `${node.nodeType} – ${node.nodeName}`)
-                .join(',');
-            console.log(`\tNode Children: ${children}`);
-
             switch (currentNode.nodeType) {
                 case globalThis.Node.ELEMENT_NODE: {
-                    // Handle element by replacing the content between the START TAG
-                    // and END TAG, e.g. from `<p>hi</p>` replaces "hi"
-                    return (currentNode as Element).outerHTML.replace(
-                        /(?<=>)([\w\s]+)(?=<\/)/,
-                        getHTML(currentNode, options)
-                    );
+                    const element = currentNode as Element;
+
+                    let s = `<${element.tagName.toLowerCase()}`;
+                    if (element.hasAttributes()) {
+                        s += [...new Set(element.getAttributeNames())]
+                            .map(
+                                (name): string =>
+                                    ` ${name}="${element.getAttribute(name)}"`
+                            )
+                            .join('');
+                    }
+                    s += '>';
+                    s += getHTML(currentNode, options);
+                    s += `</${element.tagName.toLowerCase()}>`;
+
+                    return s;
                 }
                 case globalThis.Node.TEXT_NODE: {
                     const parentNode = currentNode.parentNode;
@@ -189,35 +153,8 @@ export const getHTML = (
             }
         }
     );
-    console.log(`fragments: ${fragments}`);
+
     serializeResult += fragments.join('');
-
-    // TMP
-    const walker = document.createTreeWalker(
-        node,
-        globalThis.NodeFilter.SHOW_ALL,
-        {
-            acceptNode: (currentNode) =>
-                currentNode === node || currentNode instanceof SVGElement
-                    ? NodeFilter.FILTER_SKIP
-                    : NodeFilter.FILTER_ACCEPT,
-        }
-    );
-    let currentNode: Node | null = null;
-    while ((currentNode = walker.nextNode())) {
-        console.log('Walker');
-        console.log('Current Node');
-        console.log(`\tNode name: ${currentNode.nodeName}`);
-        console.log(`\tNode Type: ${currentNode.nodeType}`);
-        console.log(`\tNode Value: ${currentNode.nodeValue}`);
-        const children = [...currentNode.childNodes.values()]
-            .map((node): string => `${node.nodeType} – ${node.nodeName}`)
-            .join(',');
-        console.log(`\tNode Children: ${children}`);
-    }
-    // EOF TEMP
-
-    console.log(`RESULT: ${serializeResult}`);
 
     return serializeResult;
 };

@@ -29,4 +29,17 @@ describe('html tagged template literal', (): void => {
 
         assertEquals(actual, expected);
     });
+
+    it('can return valid html with expression over multiple lines', (): void => {
+        const expression = 'world';
+
+        const actual = html`<p>
+            Hello ${`
+            `} ${expression}
+        </p>`;
+
+        const expected = '<p>Hello world</p>';
+
+        assertEquals(actual, expected);
+    });
 });

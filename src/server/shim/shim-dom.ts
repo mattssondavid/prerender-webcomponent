@@ -1,9 +1,9 @@
-import { getHTML } from '@server/shim/shim-getHtml.ts';
+import { getHTML, GetHTMLOptions } from '@server/shim/shim-getHtml.ts';
 import { JSDOM } from 'jsdom';
 
 declare global {
     interface SerializableElement {
-        getHTML: typeof getHTML;
+        getHTML: (options?: GetHTMLOptions) => string;
     }
 
     interface SerializableShadowRoot {
@@ -43,7 +43,12 @@ const patchGlobalThis = (): void => {
     });
 
     // Polyfill `getHTML`
-    globalThis.Element.prototype.getHTML ??= getHTML;
-    globalThis.ShadowRoot.prototype.getHTML ??= getHTML;
+    globalThis.Element.prototype.getHTML ??= function (
+        options?: GetHTMLOptions
+    ): string {
+        return getHTML(this, options);
+    };
+    globalThis.ShadowRoot.prototype.getHTML ??=
+        globalThis.Element.prototype.getHTML; // Defined above
 };
 patchGlobalThis();

@@ -1,4 +1,3 @@
-import '@server/shim/shim-dom.ts';
 import { getHTML } from '@server/shim/shim-getHtml.ts';
 import { assertEquals } from '@std/assert';
 import { afterEach, beforeAll, describe, it } from '@std/testing/bdd';

@@ -9,15 +9,13 @@ export const html = (
     strings: TemplateStringsArray,
     ...substitutions: unknown[]
 ): string => {
-    const content = strings
-        .map((string): string => string)
-        .reduce((accumulator, current, index): string => {
-            const substitution = substitutions[index];
-            return (accumulator +=
-                typeof substitution !== 'undefined'
-                    ? current + String(substitution)
-                    : current);
-        }, '');
-
-    return content;
+    return strings.reduce((accumulator, current, index): string => {
+        const substitution = substitutions[index] ?? '';
+        // Strip away `\n`
+        const strippedCurrent = current
+            .replace(/\n\s{2,}/g, ' ')
+            .replaceAll(/\s{1,}(?=[<>])/g, '')
+            .replaceAll(/>\s{1,}/g, '>');
+        return accumulator.trimEnd() + strippedCurrent + String(substitution);
+    }, '');
 };

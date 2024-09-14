@@ -1,7 +1,7 @@
-import { html } from '@util/template/html.ts';
 import '@server/shim/shim-dom.ts';
+import { html } from '@util/template/html.ts';
 
-type GetHTMLOptions = {
+export type GetHTMLOptions = {
     readonly serializableShadowRoots?: boolean;
     readonly shadowRoots?: globalThis.ShadowRoot[];
 };
@@ -85,9 +85,7 @@ export const getHTML = (
                     ${shadow.serializable ? 'shadowrootserializable=""' : ''}
                     ${shadow.clonable ? 'shadowrootclonable=""' : ''}
                     >${getHTML(shadow, options)}</template
-                >`
-                    .replaceAll(/\s{2,}/g, ' ')
-                    .replaceAll(/\s{1,}(?=[<>])/g, '');
+                >`;
 
                 serializeResult += template;
             }

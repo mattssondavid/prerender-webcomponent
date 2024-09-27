@@ -23,6 +23,6 @@
     },
     "tasks": {
         "build": "echo 'Not Implemented'",
-        "test": "deno test --allow-env"
+        "test": "deno test --allow-env --allow-write"
     }
 }

@@ -71,6 +71,25 @@ class DelegatesFocusElement extends HTMLElement {
     }
 }
 
+class SerializableDelegatesFocusElement extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    connectedCallback(): void {
+        if (!this.shadowRoot) {
+            const template = document.createElement('template');
+            template.innerHTML = `<slot></slot>`;
+
+            this.attachShadow({
+                mode: 'open',
+                serializable: true,
+                delegatesFocus: true,
+            }).appendChild(template.content.cloneNode(true));
+        }
+    }
+}
+
 describe('getHTML', (): void => {
     beforeAll((): void => {
         window.customElements.define('open-element', OpenElement);
@@ -78,6 +97,10 @@ describe('getHTML', (): void => {
         window.customElements.define(
             'serializable-element',
             SerializableElement
+        );
+        window.customElements.define(
+            'serializable-delegates-focus-element',
+            SerializableDelegatesFocusElement
         );
         window.customElements.define(
             'delegates-focus-element',
@@ -179,16 +202,35 @@ describe('getHTML', (): void => {
         document.body.appendChild(element);
 
         const actual = getHTML(element, { serializableShadowRoots: true });
-        const expected = `<template shadowrootmode="open"\
-        shadowrootserializable=""><slot></slot></template><p>Hello there</p>`.replaceAll(
-            /\s{2,}/g,
-            ' '
-        );
+        const expected = `\
+            <template \
+                shadowrootmode="open" \
+                shadowrootserializable="" \
+                ><slot></slot> \
+            </template> \
+            <p>Hello there</p>`
+            .replaceAll(/\s{2,}/g, ' ')
+            .replaceAll(' >', '>')
+            .replaceAll('> <', '><')
+            .trim();
 
         assertEquals(actual, expected);
     });
 
-    it('serialises custom element with delegate focus with option serializableShadowRoots', (): void => {
+    it('serialises custom element with open element shadowRoot with option serializableShadowRoots but element is not serialiseable', (): void => {
+        const element = document.createElement('open-element');
+        const p = document.createElement('p');
+        p.textContent = 'Hello there';
+        element.appendChild(p);
+        document.body.appendChild(element);
+
+        const actual = getHTML(element, { serializableShadowRoots: true });
+        const expected = '<p>Hello there</p>';
+
+        assertEquals(actual, expected);
+    });
+
+    it('serialises custom element with delegate focus with option serializableShadowRoots but element is not serialiseable', (): void => {
         const element = document.createElement('delegates-focus-element');
         const p = document.createElement('p');
         p.textContent = 'Hello there';
@@ -196,13 +238,33 @@ describe('getHTML', (): void => {
         document.body.appendChild(element);
 
         const actual = getHTML(element, { serializableShadowRoots: true });
-        // ToDo: In the future when JSDOM supports `ShadowRoot.delegatesFocus`
-        // update the expected value to include `shadowrootdelegatesfocus=""`
-        const expected = `<template shadowrootmode="open"\
-        shadowrootserializable=""><slot></slot></template><p>Hello there</p>`.replaceAll(
-            /\s{2,}/g,
-            ' '
+        const expected = '<p>Hello there</p>';
+
+        assertEquals(actual, expected);
+    });
+
+    it('serialises custom element with delegate focus with option serializableShadowRoots', (): void => {
+        const element = document.createElement(
+            'serializable-delegates-focus-element'
         );
+        const p = document.createElement('p');
+        p.textContent = 'Hello there';
+        element.appendChild(p);
+        document.body.appendChild(element);
+
+        const actual = getHTML(element, { serializableShadowRoots: true });
+        const expected = `\
+            <template \
+                shadowrootmode="open" \
+                shadowrootdelegatesfocus="" \
+                shadowrootserializable="" \
+                ><slot></slot> \
+            </template> \
+            <p>Hello there</p>`
+            .replaceAll(/\s{2,}/g, ' ')
+            .replaceAll(' >', '>')
+            .replaceAll('> <', '><')
+            .trim();
 
         assertEquals(actual, expected);
     });
@@ -215,11 +277,17 @@ describe('getHTML', (): void => {
         document.body.appendChild(element);
 
         const actual = getHTML(element, { shadowRoots: [element.shadowRoot!] });
-        const expected = `<template shadowrootmode="open"\
-        shadowrootserializable=""><slot></slot></template><p>Hello there</p>`.replaceAll(
-            /\s{2,}/g,
-            ' '
-        );
+        const expected = `
+            <template \
+                shadowrootmode="open" \
+                shadowrootserializable="" \
+                ><slot></slot> \
+            </template> \
+            <p>Hello there</p>`
+            .replaceAll(/\s{2,}/g, ' ')
+            .replaceAll(' >', '>')
+            .replaceAll('> <', '><')
+            .trim();
 
         assertEquals(actual, expected);
     });
@@ -235,11 +303,17 @@ describe('getHTML', (): void => {
             serializableShadowRoots: true,
             shadowRoots: [element.shadowRoot!],
         });
-        const expected = `<template shadowrootmode="open"\
-        shadowrootserializable=""><slot></slot></template><p>Hello there</p>`.replaceAll(
-            /\s{2,}/g,
-            ' '
-        );
+        const expected = `
+            <template \
+                shadowrootmode="open" \
+                shadowrootserializable="" \
+                ><slot></slot> \
+            </template> \
+            <p>Hello there</p>`
+            .replaceAll(/\s{2,}/g, ' ')
+            .replaceAll(' >', '>')
+            .replaceAll('> <', '><')
+            .trim();
 
         assertEquals(actual, expected);
     });
@@ -268,20 +342,19 @@ describe('getHTML', (): void => {
 
         const actual = getHTML(outerElement, { serializableShadowRoots: true });
         const expected = `\
-        <template \
-            shadowrootmode="open" \
-            shadowrootserializable="" \
-        ><slot></slot> \
-        </template> \
-        <serializable-element> \
             <template \
                 shadowrootmode="open" \
                 shadowrootserializable="" \
             ><slot></slot> \
             </template> \
-            <p>Hello there</p> \
-        </serializable-element> \
-        `
+            <serializable-element> \
+                <template \
+                    shadowrootmode="open" \
+                    shadowrootserializable="" \
+                ><slot></slot> \
+                </template> \
+                <p>Hello there</p> \
+            </serializable-element>`
             .replaceAll(/\s{2,}/g, ' ')
             .replaceAll(' >', '>')
             .replaceAll('> <', '><')

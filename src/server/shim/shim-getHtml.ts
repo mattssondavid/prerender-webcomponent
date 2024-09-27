@@ -58,20 +58,6 @@ export const getHTML = (
             // `node` is a Shadow Host
             const shadow = (node as Element).shadowRoot!;
 
-            // Temporary patches if not properly defined
-            if (typeof shadow.clonable === 'undefined') {
-                (shadow.clonable as boolean) = false;
-            }
-            if (typeof shadow.delegatesFocus === 'undefined') {
-                (shadow.delegatesFocus as boolean) = false;
-            }
-            if (typeof shadow.mode === 'undefined') {
-                (shadow.mode as globalThis.ShadowRootMode) = 'open';
-            }
-            if (typeof shadow.serializable === 'undefined') {
-                (shadow.serializable as boolean) = true;
-            }
-
             if (
                 (options?.serializableShadowRoots === true &&
                     shadow.serializable === true) ||

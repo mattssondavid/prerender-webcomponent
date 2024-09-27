@@ -42,4 +42,30 @@ describe('html tagged template literal', (): void => {
 
         assertEquals(actual, expected);
     });
+
+    it('can return valid html with special parts', (): void => {
+        const expression = 'world';
+
+        const actual = html`<p>Hello <strong>${expression}</strong></p>`;
+
+        const expected = '<p>Hello <strong>world</strong></p>';
+
+        assertEquals(actual, expected);
+    });
+
+    it('can return valid html with special parts over multiple lines', (): void => {
+        const expression = 'world';
+
+        const actual = html`<p>
+            Hello
+            <strong
+                >${`
+            `}${expression}</strong
+            >
+        </p>`;
+
+        const expected = '<p>Hello <strong>world</strong></p>';
+
+        assertEquals(actual, expected);
+    });
 });

@@ -7,6 +7,9 @@ const isCustomElementTag = (element: Element): boolean => {
 
 export const renderToString = async (content: string): Promise<string> => {
     // Parse content
+    if (content.length === 0) {
+        return '';
+    }
     const document = parseHTMLFromString(content);
 
     // Evaluate scripts nodes before appended to the DOM if they contain

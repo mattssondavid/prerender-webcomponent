@@ -14,4 +14,4 @@ There are several approaches to accomplish this; one is to use the Browsers' bui
 
 ## Usage
 
-Transform the HTML via `renderToString` where each Node is run through a polyfilled get HTML-method.
+Transform the HTML via `renderToString` where each Node is run through a polyfilled getHTML-method.

@@ -38,24 +38,25 @@ describe('renderToString', (): void => {
             </html>`;
 
         const actual = await renderToString(htmlContent);
-        const expected = `
-            <!DOCTYPE html> \
-            <html> \
-                <head></head> \
-                <body> \
-                    <simon-says> \
-                        <template \
-                            shadowrootmode="open" \
-                            shadowrootserializable=""> \
-                            <p>Simon says <slot></slot></p \
-                        ></template> \
-                    </simon-says> \
-                </body> \
+        const expected = html`<!DOCTYPE html>
+            <html>
+                <head></head>
+                <body>
+                    <simon-says>
+                        <template
+                            shadowrootmode="open"
+                            shadowrootserializable=""
+                        >
+                            <p>Simon says <slot></slot></p
+                        ></template>
+                    </simon-says>
+                </body>
             </html>`
             .replaceAll(/\s{2,}/g, ' ')
             .replaceAll(' >', '>')
             .replaceAll('> <', '><')
             .trim();
+
         assertEquals(actual, expected);
     });
 
@@ -70,25 +71,26 @@ describe('renderToString', (): void => {
             </html>`;
 
         const actual = await renderToString(htmlContent);
-        const expected = `
-            <!DOCTYPE html> \
-            <html> \
-                <head></head> \
-                <body> \
-                    <simon-says> \
-                        <template \
-                            shadowrootmode="open" \
-                            shadowrootserializable=""> \
-                                <p>Simon says <slot></slot></p> \
-                        </template> \
-                        What? \
-                    </simon-says> \
-                </body> \
+        const expected = html`<!DOCTYPE html>
+            <html>
+                <head></head>
+                <body>
+                    <simon-says>
+                        <template
+                            shadowrootmode="open"
+                            shadowrootserializable=""
+                        >
+                            <p>Simon says <slot></slot></p>
+                        </template>
+                        What?
+                    </simon-says>
+                </body>
             </html>`
             .replaceAll(/\s{2,}/g, ' ')
             .replaceAll(' >', '>')
             .replaceAll('> <', '><')
             .trim();
+
         assertEquals(actual, expected);
     });
 
@@ -115,19 +117,19 @@ describe('renderToString', (): void => {
             </html>`;
 
         const actual = await renderToString(htmlContent);
-        const expected = `
-            <!DOCTYPE html> \
-            <html> \
-                <head></head> \
-                <body> \
-                    <simon-says> \
-                        <template \
-                            shadowrootmode="open" \
-                            shadowrootserializable=""> \
-                            <p>Simon says <slot></slot></p \
-                        ></template> \
-                    </simon-says> \
-                </body> \
+        const expected = html`<!DOCTYPE html>
+            <html>
+                <head></head>
+                <body>
+                    <simon-says>
+                        <template
+                            shadowrootmode="open"
+                            shadowrootserializable=""
+                        >
+                            <p>Simon says <slot></slot></p
+                        ></template>
+                    </simon-says>
+                </body>
             </html>`
             .replaceAll(/\s{2,}/g, ' ')
             .replaceAll(' >', '>')

@@ -57,6 +57,9 @@ const patchGlobalThis = (): void => {
         'HTMLTemplateElement',
         'Node',
         'ShadowRoot',
+        'DOMParser',
+        'NodeFilter',
+        'XMLSerializer',
     ];
     patchedDOMAPIs.forEach((domApi: string): void => {
         Reflect.set<typeof globalThis, string>(

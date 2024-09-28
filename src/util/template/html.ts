@@ -14,7 +14,8 @@ export const html = (
         // Strip away `\n`
         const strippedCurrent = current
             .replace(/\n\s{2,}/g, ' ')
-            .replaceAll(/\s{1,}(?=[<>])/g, '')
+            .replaceAll(/\s{1,}(?=<\/)/g, '')
+            .replaceAll(/\s{1,}(?=>)/g, '')
             .replaceAll(/>\s{1,}/g, '>');
         return accumulator.trimEnd() + strippedCurrent + String(substitution);
     }, '');

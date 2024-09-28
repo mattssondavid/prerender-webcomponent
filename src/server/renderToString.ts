@@ -93,6 +93,12 @@ export const renderToString = async (content: string): Promise<string> => {
                     const _element = new defintion();
                     // Trigger `connectedCallback()`
                     document.body.appendChild(_element); // Temporarily add to DOM
+
+                    // Append all child nodes of the original element
+                    element.childNodes.forEach((child): void => {
+                        _element.appendChild(child.cloneNode());
+                    });
+
                     if (_element.shadowRoot) {
                         innerHTML = _element.getHTML({
                             shadowRoots: [_element.shadowRoot],
